@@ -17,8 +17,9 @@ yolodata_dir = "{}/coco/yolo".format(HOMEDIR)
 # The directory name which holds the image sets.
 imgset_dir = "data/ImageSets"
 # The direcotry which contains the images.
-img_dir = "images"
+img_dir = "CocoImages"
 img_ext = "jpg"
+dst_img_dir = "JPEGImages"
 # The directory which contains the annotations.
 #anno_dir = "annotations"
 #anno_ext = "json"
@@ -26,9 +27,8 @@ train_list_file = "{}/train.txt".format(YoloImageSets_dir)
 minival_list_file = "{}/val.txt".format(YoloImageSets_dir)
 test_list_file = "{}/test.txt".format(YoloImageSets_dir)
 
-train_label_subsets = "G:/coco/yolo/data/labels/train2017"
-val_label_subsets = "G:/coco/yolo/data/labels/val2017"
-dst_label_dir = "G:/coco/yolo/data/labels"
+src_label_dir = "G:/coco/yolo/data/labels"
+dst_label_dir = "G:/coco/CocoImages/labels"
 
 def change(path, path1):
     for f in os.listdir(path):
@@ -55,7 +55,7 @@ if redo or not os.path.exists(train_list_file):
                 img_file = "{}/{}/{}.{}".format(img_dir, subset, name, img_ext)
                 assert os.path.exists("{}/{}".format(data_dir, img_file)), \
                         "{}/{} does not exist".format(data_dir, img_file)
-                abs_img_file = "{}/{}".format(data_dir, img_file)
+                abs_img_file = "{}/{}/{}/{}.{}".format(data_dir, img_dir, dst_img_dir, name, img_ext)
                 img_files.append(abs_img_file)
     # Shuffle the images.
     idx = [i for i in xrange(len(img_files))]
@@ -77,7 +77,7 @@ if redo or not os.path.exists(minival_list_file):
                 img_file = "{}/{}/{}.{}".format(img_dir, subset, name, img_ext)
                 assert os.path.exists("{}/{}".format(data_dir, img_file)), \
                         "{}/{} does not exist".format(data_dir, img_file)
-                abs_img_file = "{}/{}".format(data_dir, img_file)
+                abs_img_file = "{}/{}/{}/{}.{}".format(data_dir, img_dir, dst_img_dir, name, img_ext)
                 img_files.append(abs_img_file)
     with open(minival_list_file, "w") as f:
         for i in xrange(len(img_files)):
@@ -96,12 +96,11 @@ if redo or not os.path.exists(test_list_file):
                 img_file = "{}/{}/{}.{}".format(img_dir, subset, name, img_ext)
                 assert os.path.exists("{}/{}".format(data_dir, img_file)), \
                         "{}/{} does not exist".format(data_dir, img_file)
-                abs_img_file = "{}/{}".format(data_dir, img_file)
+                abs_img_file = "{}/{}/{}/{}.{}".format(data_dir, img_dir, dst_img_dir, name, img_ext)
                 img_files.append(abs_img_file)
     with open(test_list_file, "w") as f:
         for i in xrange(len(img_files)):
             f.write("{}\n".format(img_files[i]))
 
-# Copy annotations from subset to labels.
-change(train_label_subsets, dst_label_dir)
-change(val_label_subsets, dst_label_dir)
+change(src_label_dir, dst_label_dir)
+

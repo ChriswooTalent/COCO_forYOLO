@@ -1,9 +1,13 @@
 import os
 import subprocess
 import sys
+import shutil
 
 HOMEDIR = "G:"
 CURDIR = os.path.dirname(os.path.realpath(__file__))
+train_label_subsets = "G:/coco/yolo/data/labels/train2017"
+val_label_subsets = "G:/coco/yolo/data/labels/val2017"
+dst_label_dir = "G:/coco/yolo/data/labels"
 
 ### Modify the address and parameters accordingly ###
 # If true, redo the whole thing.
@@ -24,6 +28,15 @@ out_anno_dir = "{}/yolo/data/labels".format(coco_data_dir)
 # The directory which stores the imageset information for each set.
 imgset_dir = "{}/yolo/data/ImageSets".format(coco_data_dir)
 
+def change(path, path1):
+    for f in os.listdir(path):
+        if os.path.isfile(path + os.path.sep + f):
+            a, b = os.path.splitext(f)
+            if b != '.py':
+                shutil.copy(path + os.sep + f, path1)
+        elif os.path.isdir(path + os.path.sep + f):
+            change(path + os.sep + f, path1)
+
 ### Process each set ###
 for i in xrange(0, len(anno_sets)):
     anno_set = anno_sets[i]
@@ -41,3 +54,7 @@ for i in xrange(0, len(anno_sets)):
         process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
         output = process.communicate()[0]
         print output
+
+# Copy annotations from subset to labels.
+change(train_label_subsets, dst_label_dir)
+change(val_label_subsets, dst_label_dir)

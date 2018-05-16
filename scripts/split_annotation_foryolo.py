@@ -1,10 +1,15 @@
+from pycocotools.coco import COCO
 import argparse
 from collections import OrderedDict
 import json
 import os
 from pprint import pprint
 import sys
+import skimage.io as io
+import matplotlib.pyplot as plt
+import pylab
 sys.path.append(os.path.dirname(sys.path[0]))
+pylab.rcParams['figure.figsize'] = (8.0, 10.0)
 
 from pycocotools.coco import COCO
 
@@ -53,20 +58,23 @@ if __name__ == "__main__":
             img_anno["annotation"] = anno
             width = img[0]["width"]
             height = img[0]["height"]
+            dw = 1. / (width)
+            dh = 1. / (height)
             yoloanno_filename = "{}/{}.txt".format(out_dir, name)
             yoloanno_file = open(yoloanno_filename, 'w')
             if(len(anno) > 0):
                 for s_anno in anno:
-                    w_min = s_anno["bbox"][0]/width
-                    h_min = s_anno["bbox"][1]/height
-                    w_max = s_anno["bbox"][2]/width
-                    h_max = s_anno["bbox"][3]/height
+                    x_center = s_anno["bbox"][0]+s_anno["bbox"][2]/2.0
+                    y_center = s_anno["bbox"][1]+s_anno["bbox"][3]/2.0
+                    w = s_anno["bbox"][2]
+                    h = s_anno["bbox"][3]
+                    x_center = x_center * dw
+                    y_center = y_center * dh
+                    w = w * dw
+                    h = h * dh
                     cat_id = s_anno["category_id"]
-                    bb = (w_min, h_min, w_max, h_max)
+                    bb = (x_center, y_center, w, h)
                     yoloanno_file.write(str(cat_id) + " " + " ".join([str(a) for a in bb]) + '\n')
-#            anno_file = "{}/{}.json".format(out_dir, name)
-#            with open(anno_file, "w") as f:
-#                json.dump(img_anno, f, sort_keys=True, indent=2, ensure_ascii=False)
         if imgset_file:
             img_names.append(name)
     if img_names:
